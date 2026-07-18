@@ -1,0 +1,75 @@
+"""Domain layer (③): AgentSpec/Tool/Session entities + 15 SPI Port protocols.
+
+This layer depends on no framework or external component; ①→②→③←④.
+"""
+
+from openstrata_sdk.domain.models import (
+    AgentHandle,
+    AgentSpec,
+    AgentSpecBuilder,
+    ChatMessage,
+    ChatRequest,
+    ChatResponse,
+    DeployHandle,
+    DeploySpec,
+    Doc,
+    EmbedRequest,
+    EmbedResponse,
+    EvalReport,
+    EvalSpec,
+    FineTuneHandle,
+    FineTuneSpec,
+    GatewayRequest,
+    GatewayResponse,
+    Guardrails,
+    Hit,
+    ModelBinding,
+    ObjectSchema,
+    RAGHit,
+    RerankRequest,
+    RerankResponse,
+    SandboxResult,
+    Span,
+    StreamChunk,
+    TenantConfig,
+    TenantContext,
+    WorkflowHandle,
+    WorkflowSpec,
+)
+from openstrata_sdk.domain.objects import (
+    OpenStrataError,
+    Retriever,
+    Session,
+    Tool,
+)
+from openstrata_sdk.domain.ports import (
+    AgentRuntime,
+    Auth,
+    CICD,
+    Cache,
+    Eval,
+    Gateway,
+    LLMProvider,
+    LowCode,
+    MLOps,
+    MultiTenancy,
+    RAG,
+    Sandbox,
+    Tracing,
+    VectorStore,
+    Workflow,
+)
+
+__all__ = [
+    "AgentSpec", "AgentSpecBuilder", "AgentHandle", "ChatRequest", "ChatResponse",
+    "ChatMessage", "EmbedRequest", "EmbedResponse", "RerankRequest", "RerankResponse",
+    "StreamChunk", "Doc", "Hit", "RAGHit", "GatewayRequest", "GatewayResponse",
+    "Span", "TenantContext", "TenantConfig", "WorkflowSpec", "WorkflowHandle",
+    "SandboxResult", "DeploySpec", "DeployHandle", "FineTuneSpec", "FineTuneHandle",
+    "EvalSpec", "EvalReport",
+    "Tool", "Session", "Retriever", "ObjectSchema", "ModelBinding", "Guardrails",
+    "OpenStrataError",
+    "LLMProvider", "VectorStore", "AgentRuntime", "Cache", "Gateway", "Tracing",
+    "Auth", "RAG", "LowCode", "Workflow", "Sandbox", "CICD", "MultiTenancy",
+    "MLOps", "Eval",
+]
