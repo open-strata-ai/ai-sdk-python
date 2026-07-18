@@ -1,0 +1,22 @@
+# OpenStrata Python SDK — SPI adapter local configuration fragment (DESIGN §7.1).
+# Rendered by the meta repository; expanded at runtime via ${VAR} / ${VAR:-default}.
+# Priority: constructor params > env > this file > defaults.
+
+[openstrata.gateway]
+provider = "logging"
+base_url = "${GATEWAY_BASE_URL}"
+
+[openstrata.model]
+qwen = { type = "dashscope", default = true }   # third-party LLM (§4.4.4)
+openai = { type = "openai" }
+claude = { type = "anthropic" }
+
+[openstrata.cache]
+provider = "memory"                              # core; valkey is the OSI replacement
+
+[openstrata.vector_store]
+preference = "memory"                            # default; qdrant/milvus alternative (§10.4)
+
+[openstrata.observability]
+otel_traces = true
+audit_log = true                                # core baseline (§4.8)
