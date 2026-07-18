@@ -1,15 +1,15 @@
 # ai-sdk-python · AI Coding Skills (SKILLS)
 
-> **Source**: design/DESIGN.md §5 (Extension Points) · §4 (Key Usage and Code Examples) · §9 (Error Handling and Observability)
+> **Source**: docs/DESIGN.md §5 (Extension Points) · §4 (Key Usage and Code Examples) · §9 (Error Handling and Observability)
 > **Audience**: AI coding Agent, SDK secondary developers
-> **Collaboration**: arch/ARCH.md (architecture) · specs/SPECS.md (contract) · design/adr/ (decision record)
+> **Collaboration**: docs/ARCH.md (architecture) · docs/SPECS.md (contract) · docs/adr/ (decision record)
 > **Platform version**: strata v1.0.0
 
 ---
 
 ## 1. Extension points (SPI port implementation guide)
 
-> Corresponds to design/DESIGN.md §5. The extension point of the SDK is the platform SPI port; the name is consistent with the §10.4 canonical port name.
+> Corresponds to docs/DESIGN.md §5. The extension point of the SDK is the platform SPI port; the name is consistent with the §10.4 canonical port name.
 > The host application only needs to implement the corresponding `domain` protocol class and pass it into the constructor to replace the default implementation - **zero changes to the SDK core** (dependency inversion + anti-corrosion layer ACL).
 
 ### 1.1 Access custom LLMProvider
@@ -126,7 +126,7 @@ The SDK exposes all 15 types of port protocols:
 
 ## 2. Key usage and code examples
 
-> Corresponds to design/DESIGN.md §4. All examples run out of the box (Python 3.11+).
+> Corresponds to docs/DESIGN.md §4. All examples run out of the box (Python 3.11+).
 
 ### 2.1 Quickstart: Run through conversational Agent in 30 minutes
 
@@ -219,7 +219,7 @@ print()
 
 ## 3. Error handling and observability → Coding rules
 
-> Corresponds to design/DESIGN.md §9. The following rules are derived from the error model and observability design, and must be strictly implemented by the AI ​​coding agent.
+> Corresponds to docs/DESIGN.md §9. The following rules are derived from the error model and observability design, and must be strictly implemented by the AI ​​coding agent.
 
 ### Rule R1: Use unified exception types
 
@@ -349,4 +349,4 @@ Construction parameters > environment variables > pyproject.toml [tool.openstrat
 
 ---
 
-> **Associated documents**: arch/ARCH.md (architecture and port list) · specs/SPECS.md (SPI version contract and configuration keys) · design/DESIGN.md (complete design)
+> **Associated documents**: docs/ARCH.md (architecture and port list) · docs/SPECS.md (SPI version contract and configuration keys) · docs/DESIGN.md (complete design)

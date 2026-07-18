@@ -1,15 +1,15 @@
-# ADR-0004: Sandbox code execution
+# ADR-0003: LowCode canvas export
 
 - **Status**: Pending (Open)
 - **Date**: 2026-07-17
 - **Suggested by**: OpenStrata Architecture Group
 - **Repository**: ai-sdk-python
-- **Source**: `design/DESIGN.md` §11 Open Issue
+- **Source**: `docs/DESIGN.md` §11 Open Issue
 - **Association**: (within this repository)
 
 ##Context
 
-When Tool executes code, does the SDK directly support the `Sandbox` port client, or is it routed uniformly through the Gateway? Involves network isolation policies (§4.3.3).
+Is the `react-flow → AgentSpec` exporter of the `LowCode` port down to the SDK, or is it only provided on the platform side? Affects cross-language consistency.
 
 ## Decision Options (Options Considered)
 
@@ -19,7 +19,7 @@ When Tool executes code, does the SDK directly support the `Sandbox` port client
 
 ## Recommended decision (Decision)
 
-This ADR solidifies "Sandbox code execution" into an architectural decision record and incorporates it into `design/adr/` for continuous tracking. This issue stems from the `design/DESIGN.md` §11 open issue and is still open.
+This ADR solidifies "LowCode Canvas Export" as an architectural decision record and incorporates it into `docs/adr/` for continuous tracking. This issue stems from the `docs/DESIGN.md` §11 open issue and is still open.
 
 **Conservative Default Principle**: Before the final decision is made, the "minimum available + explicit configuration switch" shall prevail, maintain the current behavior, and not destroy the existing contract and cross-repository SPI interface; this ADR status will be written back after review by the relevant team.
 
@@ -27,10 +27,9 @@ This ADR solidifies "Sandbox code execution" into an architectural decision reco
 
 ## To be aligned / Follow-ups (Follow-ups)
 
-- Associated architecture documents §4.3.3 (as a basis for decision-making and a source of consistency verification).
 - Solidify the decision before the review at the corresponding stage, and write the final conclusion back into this ADR (the status is changed from "Pending" to "Adopted").
 
 ## Traceback
 
-- Upstream design: `design/DESIGN.md` §11 Open issue
-- Relevance index: see `design/adr/README.md`
+- Upstream design: `docs/DESIGN.md` §11 Open issue
+- Relevance index: see `docs/adr/README.md`

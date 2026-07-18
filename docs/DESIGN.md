@@ -1,7 +1,7 @@
 # ai-sdk-python · Detailed design (DESIGN)
 
-> This file is the **detailed design document** of `ai-sdk-python`, covering and replacing the original placeholder skeleton of `design/DESIGN.md`.
-> It co-evolves with the main repository `arch/` (architecture positioning), `skills/` (AI coding skills), `specs/` (contract), and major decisions are recorded as ADRs in `design/adr/`.
+> This file is the **detailed design document** of `ai-sdk-python`, covering and replacing the original placeholder skeleton of `docs/DESIGN.md`.
+> It co-evolves with the main repository `arch/` (architecture positioning), `skills/` (AI coding skills), `specs/` (contract), and major decisions are recorded as ADRs in `docs/adr/`.
 > `arch/` `skills/` `specs/` `README.md` is not within the scope of changes to this document.
 
 | meta information | value |
@@ -13,7 +13,7 @@
 | **Platform version** | v1.0.0 (`strata v1.0.0`, released 2026-07-15) |
 | **Document Status** | Draft |
 | **Responsible Person** | OpenStrata Architecture Group |
-| **Associated links** | [arch/ARCH.md](./../arch/ARCH.md) · [skills/SKILLS.md](./../skills/SKILLS.md) · [specs/SPECS.md](./../specs/SPECS.md) · Architecture documentation §4.3.5 / §4.4 / §10.4 / §10.6 / §12 / §15.5 / §16 |
+| **Associated links** | [docs/ARCH.md](./ARCH.md) · [docs/SKILLS.md](./SKILLS.md) · [docs/SPECS.md](./SPECS.md) · Architecture documentation §4.3.5 / §4.4 / §10.4 / §10.6 / §12 / §15.5 / §16 |
 
 ---
 
@@ -389,7 +389,7 @@ audit_log = true                                  #core baseline (§4.8)
 
 ## 8. Version and compatibility strategy (SemVer, align platform interface_versions)
 
-- **SDK Self Version**: Following SemVer, `openstrata-sdk==1.0.0` aligns with platform `strata v1.0.0` (§16.1). Breaking changes bump `MAJOR` with ADR (`design/adr/`).
+- **SDK Self Version**: Following SemVer, `openstrata-sdk==1.0.0` aligns with platform `strata v1.0.0` (§16.1). Breaking changes bump `MAJOR` with ADR (`docs/adr/`).
 - **SPI port version contract**: Each domain port is marked with the `interface_versions` (§16) to which it is aligned, evolving with the `bom.yaml` frozen snapshot. SDK 1.0.0 promises compatibility with:
 
 | Port | Minimum compatible interface_version | Description |
@@ -401,7 +401,7 @@ audit_log = true                                  #core baseline (§4.8)
 | Cache | 1.0.0 | get/set stable |
 
 - **Cross-language consistency**: `ai-sdk-go` / `ai-sdk-java` / `ai-sdk-python` The three-piece set has consistent semantics for method signatures on the same SPI port (AgentSpec convergence contract §4.3.5), ensuring that the same AgentSpec can be built by any language SDK and bound to any runtime instance for execution.
-- **Minimum compatible interface version** is written into `specs/SPECS.md` compatibility commitment, and CI verifies the consistency of `bom.yaml` `interface_versions` when releasing (§16.4 / §15.6.4).
+- **Minimum compatible interface version** is written into `docs/SPECS.md` compatibility commitment, and CI verifies the consistency of `bom.yaml` `interface_versions` when releasing (§16.4 / §15.6.4).
 
 ---
 

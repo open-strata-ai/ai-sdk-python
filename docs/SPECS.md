@@ -1,15 +1,15 @@
 # ai-sdk-python · Contract (SPECS)
 
-> **Source**: design/DESIGN.md §6 (SPI Mapping Table) · §7 (Configuration Key) · §8 (Version/SemVer)
+> **Source**: docs/DESIGN.md §6 (SPI Mapping Table) · §7 (Configuration Key) · §8 (Version/SemVer)
 > **Audience**: Platform integration engineers, CI/CD verification, AI coding agents
-> **Collaboration**: arch/ARCH.md (architecture) · skills/SKILLS.md (coding rules) · bom.yaml (§16)
+> **Collaboration**: docs/ARCH.md (architecture) · docs/SKILLS.md (coding rules) · bom.yaml (§16)
 > **Platform version**: strata v1.0.0
 
 ---
 
 ## 1. SPI mapping table (port → version → SDK role)
 
-> Corresponds to design/DESIGN.md §6. This table is the **sole source of contract** between the SDK and the platform SPI.
+> Corresponds to docs/DESIGN.md §6. This table is the **sole source of contract** between the SDK and the platform SPI.
 > The port name corresponds verbatim to the `bom.yaml` `spi` field (§16.2). CI automatically verifies consistency when releasing a version.
 
 ### 1.1 Complete mapping
@@ -43,7 +43,7 @@
 
 ## 2. Configuration Keys
 
-> Corresponds to design/DESIGN.md §7. The configuration file is located in `infrastructure/config/openstrata.toml` and must be renderable by Metacang (§15.6.3).
+> Corresponds to docs/DESIGN.md §7. The configuration file is located in `infrastructure/config/openstrata.toml` and must be renderable by Metacang (§15.6.3).
 
 ### 2.1 Complete list of configuration keys
 
@@ -127,7 +127,7 @@ Construction parameters > environment variables > pyproject.toml [tool.openstrat
 
 ## 3. Version and compatibility strategy
 
-> Corresponds to design/DESIGN.md §8.
+> Corresponds to docs/DESIGN.md §8.
 
 ### 3.1 SDK own version (SemVer)
 
@@ -135,7 +135,7 @@ Construction parameters > environment variables > pyproject.toml [tool.openstrat
 - MAJOR: Destructive API changes (such as protocol method signature modifications)
 - MINOR: New port/function/Adapter, backward compatible
 - PATCH: Bug fixes, performance optimization, document updates
-- Destructive changes must be accompanied by ADR (`design/adr/`)
+- Destructive changes must be accompanied by ADR (`docs/adr/`)
 - PyPI package name: `openstrata-sdk`, import `openstrata_sdk`
 
 ### 3.2 SPI port version contract
@@ -171,4 +171,4 @@ Change process:
 
 ---
 
-> **Associated documents**: arch/ARCH.md (architecture and port list) · skills/SKILLS.md (coding rules) · design/DESIGN.md (complete design) · bom.yaml §16
+> **Associated documents**: docs/ARCH.md (architecture and port list) · docs/SKILLS.md (coding rules) · docs/DESIGN.md (complete design) · bom.yaml §16

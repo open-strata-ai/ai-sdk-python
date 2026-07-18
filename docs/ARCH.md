@@ -1,8 +1,8 @@
 # ai-sdk-python · Architecture (ARCH)
 
-> **Source**: design/DESIGN.md §1 (Positioning) · §2 (Core Abstraction) · §6 (SPI Mapping 15 Port)
+> **Source**: docs/DESIGN.md §1 (Positioning) · §2 (Core Abstraction) · §6 (SPI Mapping 15 Port)
 > **Audience**: Platform architects, SDK maintainers, AI coding agents
-> **Collaboration**: skills/SKILLS.md (extension points and coding rules) · specs/SPECS.md (contracts and versions) · design/adr/ (major decisions)
+> **Collaboration**: docs/SKILLS.md (extension points and coding rules) · docs/SPECS.md (contracts and versions) · docs/adr/ (major decisions)
 > **Platform version**: strata v1.0.0
 
 ---
@@ -32,7 +32,7 @@ Let Python developers work Pythonic with existing Python applications (FastAPI s
 |------|------|--------|
 | Python/AI Engineer | Embed Agent in existing FastAPI/Script | `Client`, `AgentSpec` |
 | Platform secondary developer | Implement custom SPI Adapter | `openstrata_sdk.domain` protocol class |
-| AI Coding Agent | Generate adaptation code according to skills/ rules | skills/SKILLS.md |
+| AI Coding Agent | Generate adaptation code according to skills/ rules | docs/SKILLS.md |
 
 ### 1.4 Boundary with platform
 
@@ -190,7 +190,7 @@ client = Client(
 
 ## 3. Mapping with platform SPI (15 port→canonical→interface_versions)
 
-> Corresponds to design/DESIGN.md §6, strictly aligned with Platform §10.4.
+> Corresponds to docs/DESIGN.md §6, strictly aligned with Platform §10.4.
 
 ### 3.1 Mapping table
 
@@ -248,4 +248,4 @@ MLOps ──→ Eval ──→ LowCode ──→ (fine-tuning→Review→Canvas 
 
 ---
 
-> **Associated documents**: skills/SKILLS.md (extension points and coding rules) · specs/SPECS.md (SPI version contract and configuration keys) · design/DESIGN.md (complete design)
+> **Associated documents**: docs/SKILLS.md (extension points and coding rules) · docs/SPECS.md (SPI version contract and configuration keys) · docs/DESIGN.md (complete design)
