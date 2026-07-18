@@ -1,18 +1,18 @@
-# ai-sdk-python · AI 编码技能（SKILLS）
+# ai-sdk-python · AI Coding Skills (SKILLS)
 
-> **来源**: design/DESIGN.md §5（扩展点）· §4（关键用法与代码示例）· §9（错误处理与可观测性）
-> **受众**: AI 编码 Agent、SDK 二次开发者
-> **协同**: arch/ARCH.md（架构）· specs/SPECS.md（契约）· design/adr/（决策记录）
-> **平台版本**: strata v1.4.0
+> **Source**: design/DESIGN.md §5 (Extension Points) · §4 (Key Usage and Code Examples) · §9 (Error Handling and Observability)
+> **Audience**: AI coding Agent, SDK secondary developers
+> **Collaboration**: arch/ARCH.md (architecture) · specs/SPECS.md (contract) · design/adr/ (decision record)
+> **Platform version**: strata v1.4.0
 
 ---
 
-## 1. 扩展点（SPI 端口实现指南）
+## 1. Extension points (SPI port implementation guide)
 
-> 对应 design/DESIGN.md §5。 SDK 的扩展点即平台 SPI 端口；名称与 §10.4 canonical 端口名一致。
-> 宿主应用只需实现对应 `domain` 协议类并传入构造器，即可替换默认实现——**零改动 SDK 核心**（依赖倒置 + 防腐层 ACL）。
+> Corresponds to design/DESIGN.md §5. The extension point of the SDK is the platform SPI port; the name is consistent with the §10.4 canonical port name.
+> The host application only needs to implement the corresponding `domain` protocol class and pass it into the constructor to replace the default implementation - **zero changes to the SDK core** (dependency inversion + anti-corrosion layer ACL).
 
-### 1.1 接入自定义 LLMProvider
+### 1.1 Access custom LLMProvider
 
 ```python
 from openstrata_sdk.domain import LLMProvider, ChatRequest, ChatResponse, EmbedRequest, EmbedResponse
@@ -23,7 +23,7 @@ class MySelfHosted:
         self.endpoint = endpoint
 
     def chat(self, req: ChatRequest) -> ChatResponse:
-        # 调自有 vLLM/TGI OpenAI-compatible 端点
+        #Tune your own vLLM/TGI OpenAI-compatible endpoint
         import httpx
         body = req.to_openai_compat()
         resp = httpx.post(f"{self.endpoint}/v1/chat/completions", json=body)
@@ -31,24 +31,24 @@ class MySelfHosted:
         return ChatResponse.model_validate(resp.json())
 
     def embed(self, req: EmbedRequest) -> EmbedResponse:
-        ...  # 同上模式
+        ...  #Ditto mode
 
     def rerank(self, req: RerankRequest) -> RerankResponse:
         ...
 
     async def stream(self, req: ChatRequest) -> AsyncIterator[StreamChunk]:
-        # SSE 流式读取 → yield StreamChunk
+        #SSE streaming read → yield StreamChunk
         async with httpx.AsyncClient() as cli:
             async with cli.stream("POST", f"{self.endpoint}/v1/chat/completions", json=req.to_openai_compat()) as resp:
                 async for line in resp.aiter_lines():
                     if line.startswith("data: "):
                         yield StreamChunk.model_validate_json(line[6:])
 
-# 注入：替换默认 LLMProvider（full 档自托管场景, §4.4.2）
+# injection：replace default LLMProvider（full File self-hosting scenario, §4.4.2）
 client = Client(llm_provider=MySelfHosted("http://vllm:8000"))
 ```
 
-### 1.2 接入自定义 VectorStore / Cache
+### 1.2 Access custom VectorStore / Cache
 
 ```python
 from openstrata_sdk.domain import VectorStore, Doc, Hit
@@ -58,26 +58,26 @@ class MyChromaStore:
         self.endpoint = endpoint
 
     def upsert(self, collection: str, docs: list[Doc]) -> None:
-        # 调 ChromaDB API
+        #Call ChromaDB API
         ...
 
     def search(self, collection: str, vec: list[float], top_k: int) -> list[Hit]:
-        # ANN 检索
+        #ANN search
         return [Hit(id=..., score=..., content=...) ...]
 
     def delete(self, collection: str, ids: list[str]) -> None:
         ...
 
-# 注入
+# injection
 client = Client(
     vector_store=MyChromaStore("http://chroma:8000"),
     cache=MyCustomCache(),
 )
 ```
 
-多实现并存（Qdrant/Milvus、Redis/Valkey）由 SDK 工厂按 `tenant.vector_store_preference` 路由（§10.4 运行时路由）。Python 协议类支持结构化子类型，无需显式 `class MyStore(VectorStore)`。
+Multiple implementations coexisting (Qdrant/Milvus, Redis/Valkey) are routed by the SDK factory according to `tenant.vector_store_preference` (§10.4 Runtime routing). Python protocol classes support structured subtyping without the need for explicit `class MyStore(VectorStore)`.
 
-### 1.3 接入自定义 AgentRuntime / Tracing
+### 1.3 Access custom AgentRuntime / Tracing
 
 ```python
 from openstrata_sdk.domain import AgentRuntime, AgentSpec, AgentHandle
@@ -87,24 +87,24 @@ class MyLocalRuntime:
         self.graph = LocalGraph()
 
     def load(self, spec: AgentSpec) -> AgentHandle:
-        # 解析 AgentSpec → 构建本地执行图
+        #Parse AgentSpec → Build local execution graph
         compiled = self.graph.compile(spec)
         return AgentHandle(id=spec.metadata.name, payload=compiled)
 
     def run(self, handle: AgentHandle, input: dict) -> dict:
-        # 本地图执行
+        #This map executes
         return handle.payload.execute(input)
 
 client = Client(agent_runtime=MyLocalRuntime())
 ```
 
-SDK 默认实现绑定平台 LangGraph（Python）实例，但宿主可换本地图执行器而不改 spec——因为 AgentSpec 声明式、与运行时无关（§4.3.5）。
+The SDK default implementation binds the platform LangGraph (Python) instance, but the host can change the local map executor without changing the spec - because AgentSpec is declarative and runtime independent (§4.3.5).
 
-### 1.4 SPI 端口完整清单（与 §10.4 严格对齐）
+### 1.4 Complete list of SPI ports (strictly aligned with §10.4)
 
-SDK 暴露全部 15 类端口协议：
+The SDK exposes all 15 types of port protocols:
 
-| 端口 | 协议签名摘要 | 版本 |
+| Port | Protocol Signature Summary | Version |
 |------|-------------|------|
 | `Gateway` | `invoke(req: GatewayRequest) -> GatewayResponse` | 1.2.0 |
 | `AgentRuntime` | `load(spec) -> AgentHandle` / `run(handle, input) -> dict` | 1.3.0 |
@@ -124,11 +124,11 @@ SDK 暴露全部 15 类端口协议：
 
 ---
 
-## 2. 关键用法与代码示例
+## 2. Key usage and code examples
 
-> 对应 design/DESIGN.md §4。所有示例可直接运行（Python 3.11+）。
+> Corresponds to design/DESIGN.md §4. All examples run out of the box (Python 3.11+).
 
-### 2.1 Quickstart: 30 分钟跑通对话式 Agent
+### 2.1 Quickstart: Run through conversational Agent in 30 minutes
 
 ```python
 from openstrata_sdk import Client
@@ -136,7 +136,7 @@ from openstrata_sdk.domain import AgentSpec, ModelBinding, ObjectSchema, Guardra
 
 client = Client.from_env()
 
-# 声明式 AgentSpec（§4.3.5 收敛契约）
+# declarative AgentSpec（§4.3.5 convergence contract）
 spec = (
     AgentSpec.builder("customer-service-v2")
     .tenant("tenant-b")
@@ -150,66 +150,66 @@ spec = (
     .build()
 )
 
-# 经 AgentRuntime SPI 加载并运行（声明式、与运行时无关）
+# through AgentRuntime SPI Load and run（declarative、Runtime independent）
 handle = client.agent_runtime.load(spec)
-out = client.agent_runtime.run(handle, {"query": "我的订单到哪了？"})
+out = client.agent_runtime.run(handle, {"query": "Where's my order?"})
 print(out["answer"])
 ```
 
-### 2.2 注册自定义 Tool
+### 2.2 Register Custom Tool
 
 ```python
 from openstrata_sdk.domain import Tool
 
 @Tool.register("order_lookup", input_schema=ObjectSchema("order_id", "string"))
 def order_lookup(ctx, order_id: str) -> dict:
-    # 调业务数据库查询
+    #Adjust business database query
     return {"status": "shipped", "order_id": order_id}
 
-# 方式一：绑定到 AgentSpec
+# Method one：bind to AgentSpec
 spec = spec.with_tool_bindings("order_lookup")
 
-# 方式二：注册到平台 ToolRegistry（走 Gateway SPI）
+# Method 2：Register to the platform ToolRegistry（Walk Gateway SPI）
 client.tools.register(order_lookup)
 
-# 方式三：使用 MCP 协议暴露
+# Method three：use MCP protocol exposed
 order_lookup.with_mcp(transport="stdio")
 ```
 
-### 2.3 RAG 检索
+### 2.3 RAG retrieval
 
 ```python
-# 获取查询向量（经 LLMProvider embed）
-emb = client.llm_provider.embed(EmbedRequest(texts=["我的订单到哪了？"]))
+# Get query vector（through LLMProvider embed）
+emb = client.llm_provider.embed(EmbedRequest(texts=["Where's my order?"]))
 
-# 检索走 VectorStore SPI；SDK 工厂按 tenant.vector_store_preference 路由
+# Search away VectorStore SPI；SDK Factory press tenant.vector_store_preference routing
 hits = client.vector_store.search("kb-tenant-b", emb.vectors[0], top_k=5)
 
-# 命中片段回填给 LLMProvider 的 prompt
+# Hit fragment backfill gives LLMProvider of prompt
 for hit in hits:
     print(f"[{hit.id}] score={hit.score:.3f} chunk={hit.content}")
-# RAG 管线由平台组合，SDK 仅暴露检索端口（§4.5）
+# RAG Pipelines are composed by platforms，SDK Only the retrieval port is exposed（§4.5）
 ```
 
-### 2.4 多轮 Session / 记忆
+### 2.4 Multi-round Session/Memory
 
 ```python
 sess = client.session("user-123")
 sess.set_working_memory_ttl(3600)  # working memory（§4.3.5 memory_bindings）
 
-# 首轮：设置记忆
-resp = client.chat(sess, "记住我姓张，VIP 等级 5")
+# first round：Setting memory
+resp = client.chat(sess, "Remember my last name is Zhang, VIP level 5")
 
-# 次轮：自动注入 memory_bindings 上下文
-resp = client.chat(sess, "我的 VIP 等级是多少？")
-print(resp)  # "您是 VIP 5，张先生"
+# second round：automatic injection memory_bindings context
+resp = client.chat(sess, "What is my VIP level?")
+print(resp)  #"You are VIP 5, Mr. Zhang"
 ```
 
-### 2.5 流式调用
+### 2.5 Streaming call
 
 ```python
 async for chunk in client.llm_provider.stream(
-    ChatRequest(messages=[Message(role="user", content="写一首诗")])
+    ChatRequest(messages=[Message(role="user", content="write a poem")])
 ):
     print(chunk.delta, end="", flush=True)
 print()
@@ -217,26 +217,26 @@ print()
 
 ---
 
-## 3. 错误处理与可观测性 → 编码规则
+## 3. Error handling and observability → Coding rules
 
-> 对应 design/DESIGN.md §9。以下规则由错误模型和可观测性设计推导，AI 编码 Agent 须严格执行。
+> Corresponds to design/DESIGN.md §9. The following rules are derived from the error model and observability design, and must be strictly implemented by the AI ​​coding agent.
 
-### 规则 R1: 使用统一异常类型
+### Rule R1: Use unified exception types
 
 ```python
 class OpenStrataError(Exception):
-    """SDK 统一错误类型。"""
+    """SDK unified error types."""
     def __init__(self, port: str, code: str, retryable: bool, cause: Exception | None = None):
-        self.port = port       # 出错 SPI 端口名
-        self.code = code       # 平台错误码（对应 Gateway 响应）
-        self.retryable = retryable  # 是否可重试
+        self.port = port       #Error SPI port name
+        self.code = code       #Platform error code (corresponding to Gateway response)
+        self.retryable = retryable  #Is it possible to retry
         self.cause = cause
         super().__init__(f"[{port}] {code} retryable={retryable}: {cause}")
 ```
 
-**规则**: 所有 SDK 内部异常必须包装为 `OpenStrataError`，标注 `port` 和 `retryable`。不允许直接 `raise e` 穿透明细异常。
+**Rule**: All SDK internal exceptions must be wrapped as `OpenStrataError`, marked `port` and `retryable`. Direct `raise e` is not allowed to pass through transparent exceptions.
 
-### 规则 R2: 不自行重试，提示上层走 fallback_chain
+### Rule R2: Do not retry by yourself, prompt the upper layer to use fallback_chain
 
 ```python
 def chat(self, req: ChatRequest) -> ChatResponse:
@@ -249,12 +249,12 @@ def chat(self, req: ChatRequest) -> ChatResponse:
             retryable=True,
             cause=e,
         ) from e
-        # 不在此循环重试 —— 上层 ModelRouter 负责故障转移
+        #Do not retry in this loop - the upper ModelRouter is responsible for failover
 ```
 
-**规则**: SDK 永远不在内部做指数退避重试。第三方 LLM 超时/配额超限 → `retryable=True` → 抛出给调用方 → 由平台 ModelRouter 走 `fallback_chain`（§4.4.5）。避免 SDK 层雪崩。
+**Rule**: The SDK never does exponential backoff retries internally. Third-party LLM timeout/quota exceeded → `retryable=True` → thrown to the caller → `fallback_chain` (§4.4.5) taken by the platform ModelRouter. Avoid the SDK layer avalanche.
 
-### 规则 R3: 所有 Port 操作须上报 Tracing span
+### Rule R3: All Port operations must be reported to Tracing span
 
 ```python
 def _do_with_trace(self, port: str, fn):
@@ -268,9 +268,9 @@ def _do_with_trace(self, port: str, fn):
         span.end()
 ```
 
-**规则**: 每个 SPI 端口调用必须创建一个 Tracing span（端口名作 span name）。出错时设置 span 状态为 error 并记录 `OpenStrataError` 详情。
+**Rule**: Each SPI port call must create a Tracing span (port name span name). On error, set span status to error and log `OpenStrataError` details.
 
-### 规则 R4: 审计日志默认开启
+### Rule R4: Audit log is enabled by default
 
 ```python
 @dataclass
@@ -285,13 +285,13 @@ class AuditLog:
 def _emit_audit(self, log: AuditLog) -> None:
     if not self.config.observability.audit_log:
         return
-    # core 基线必须开启审计（§4.8），这里仅检查开关
+    #The core baseline must enable auditing (§4.8), here only the switch is checked
     self._audit_writer.write(log)
 ```
 
-**规则**: 所有 Gateway 调用、AgentRuntime load/run、Tool 注册/执行必须输出审计日志。AgentSpec 的 `observability_hooks.audit: enabled` 为 core 基线（§4.3.5）。
+**Rule**: All Gateway calls, AgentRuntime load/run, and Tool registration/execution must output audit logs. AgentSpec's `observability_hooks.audit: enabled` is the core baseline (§4.3.5).
 
-### 规则 R5: Metrics Hook 上报关键指标
+### Rule R5: Metrics Hook reports key indicators
 
 ```python
 @dataclass
@@ -303,50 +303,50 @@ class Metric:
     cache_hit_rate: float
     error_rate: float
 
-# SDK 暴露 hook 回调
+# SDK exposed hook callback
 client = Client(
     metrics_hook=lambda m: (
-        # 经 OTel exporter 导出
+        #Exported via OTel exporter
         otel_metrics.record(m.port, m.token_usage, m.latency)
     ),
 )
 ```
 
-**规则**: 每个 SPI 端口调用结束后触发 `metrics_hook` 回调，包含 token 用量、调用延迟、缓存命中率、错误率四个维度。
+**Rules**: The `metrics_hook` callback is triggered after each SPI port call, including the four dimensions of token usage, call delay, cache hit rate, and error rate.
 
-### 规则 R6: 配置覆盖优先级
+### Rule R6: Configure coverage priority
 
 ```
-构造参数 > 环境变量 > pyproject.toml [tool.openstrata] > 平台 Manifest
+Construction parameters > environment variables > pyproject.toml [tool.openstrata] > platform Manifest
 ```
 
-**规则**: 所有配置读取必须按此优先级合并。`config.load()` 统一入口，禁止在 adapter 内部私读环境变量。
+**Rule**: All configuration reads must be merged at this priority. `config.load()` is a unified entry that prohibits private reading of environment variables inside the adapter.
 
-### 规则 R7: 跨语言 API 语义对齐
+### Rule R7: Cross-language API semantic alignment
 
-| 概念 | Python | Go | Java | 语义一致性 |
+| Concepts | Python | Go | Java | Semantic Consistency |
 |------|--------|-----|------|-----------|
-| 错误类型 | `OpenStrataError` | `domain.Error` | `OpenStrataException` | code + port + retryable |
-| 流式返回 | `AsyncIterator[StreamChunk]` | `<-chan StreamChunk` | `Flow<StreamChunk>` | 逐块推送，3 种原语语义等价 |
-| AgentSpec 解析 | `AgentSpec.parse_yaml(yaml)` | `agent.ParseSpec(yaml)` | `AgentSpec.parse(yaml)` | 同一份 YAML，同构解析 |
-| 配置注入 | 构造参数 | `client.WithXxx(...)` | `@Bean` 覆盖 | 依赖倒置，实现替换不改核心 |
+| Error type | `OpenStrataError` | `domain.Error` | `OpenStrataException` | code + port + retryable |
+| Streaming return | `AsyncIterator[StreamChunk]` | `<-chan StreamChunk` | `Flow<StreamChunk>` | Chunk-by-chunk push, 3 primitives are semantically equivalent |
+| AgentSpec parsing | `AgentSpec.parse_yaml(yaml)` | `agent.ParseSpec(yaml)` | `AgentSpec.parse(yaml)` | The same YAML, isomorphic parsing |
+| Configuration injection | Construction parameters | `client.WithXxx(...)` | `@Bean` coverage | Dependency inversion, implementation replacement without changing the core |
 
-**规则**: 同一 SPI 端口的方法签名语义跨语言一致。AgentSpec YAML schema 三 SDK 共用同一份 fixture。
+**Rule**: Method signature semantics for the same SPI port are consistent across languages. AgentSpec YAML schema and the three SDKs share the same fixture.
 
 ---
 
-## 4. 编码规则速查表
+## 4. Coding rules cheat sheet
 
-| 规则编号 | 一句话 | 违反后果 |
+| Rule Number | One Sentence | Consequences of Violation |
 |----------|--------|----------|
-| R1 | 所有异常包装为 `OpenStrataError` | 上层无法判断可重试性，故障转移失效 |
-| R2 | 不自重试，抛 `retryable=True` | 雪崩；ModelRouter fallback_chain 被短路 |
-| R3 | 每个 Port 调用包裹 Tracing span | trace 断层，无法端到端追踪 |
-| R4 | 审计日志默认开 | 合规审计缺失（§4.8 core 基线） |
-| R5 | 触发 MetricsHook | 无 token 用量/延迟/命中率监控 |
-| R6 | 配置覆盖按优先级合并 | 配置源混乱，调试困难 |
-| R7 | 跨语言 API 语义对齐 | AgentSpec 在不同 SDK 解析不一致 |
+| R1 | All exceptions are packaged as `OpenStrataError` | The upper layer cannot determine retryability, and failover fails |
+| R2 | No self-retry, throw `retryable=True` | Avalanche; ModelRouter fallback_chain is short-circuited |
+| R3 | Each Port calls the package Tracing span | trace faults, unable to be traced end-to-end |
+| R4 | Audit log is enabled by default | Compliance audit is missing (§4.8 core baseline) |
+| R5 | Trigger MetricsHook | No token usage/latency/hit rate monitoring |
+| R6 | Configuration coverage is merged according to priority | Configuration sources are confusing and debugging is difficult |
+| R7 | Cross-language API semantic alignment | AgentSpec parsing is inconsistent in different SDKs |
 
 ---
 
-> **关联文档**: arch/ARCH.md（架构与端口清单）· specs/SPECS.md（SPI 版本契约与配置键）· design/DESIGN.md（完整设计）
+> **Associated documents**: arch/ARCH.md (architecture and port list) · specs/SPECS.md (SPI version contract and configuration keys) · design/DESIGN.md (complete design)
