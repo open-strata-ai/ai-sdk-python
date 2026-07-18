@@ -3,7 +3,7 @@
 > **Source**: design/DESIGN.md §5 (Extension Points) · §4 (Key Usage and Code Examples) · §9 (Error Handling and Observability)
 > **Audience**: AI coding Agent, SDK secondary developers
 > **Collaboration**: arch/ARCH.md (architecture) · specs/SPECS.md (contract) · design/adr/ (decision record)
-> **Platform version**: strata v1.4.0
+> **Platform version**: strata v1.0.0
 
 ---
 
@@ -106,7 +106,7 @@ The SDK exposes all 15 types of port protocols:
 
 | Port | Protocol Signature Summary | Version |
 |------|-------------|------|
-| `Gateway` | `invoke(req: GatewayRequest) -> GatewayResponse` | 1.2.0 |
+| `Gateway` | `invoke(req: GatewayRequest) -> GatewayResponse` | 1.0.0 |
 | `AgentRuntime` | `load(spec) -> AgentHandle` / `run(handle, input) -> dict` | 1.3.0 |
 | `LLMProvider` | `chat(...)` / `embed(...)` / `rerank(...)` / `stream(...)` → `AsyncIterator` | 1.0.0 |
 | `VectorStore` | `upsert(...)` / `search(...)` / `delete(...)` | 1.1.0 |

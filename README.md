@@ -5,7 +5,7 @@
 - **Language**: Python (primary framework: FastAPI + Pydantic v2 + Poetry)
 - **domain**: sdk
 - **OPTIONAL**: core
-- **Meta repository reference**: `openstrata-meta/repos.yaml` (tag `v1.4.0`) · BOM see `openstrata-meta/bom.yaml`
+- **Meta repository reference**: `openstrata-meta/repos.yaml` (tag `v1.0.0`) · BOM see `openstrata-meta/bom.yaml`
 
 ## Repository unified structure (§15.6.2)
 

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ai-sdk-python"
-version = "1.4.0"
+version = "1.0.0"
 description = "OpenStrata ai-sdk-python"
 authors = ["OpenStrata <openstrata@outlook.com>"]
 packages = [{{ include = "ai_sdk_python" }}]

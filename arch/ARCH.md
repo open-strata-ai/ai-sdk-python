@@ -3,7 +3,7 @@
 > **Source**: design/DESIGN.md §1 (Positioning) · §2 (Core Abstraction) · §6 (SPI Mapping 15 Port)
 > **Audience**: Platform architects, SDK maintainers, AI coding agents
 > **Collaboration**: skills/SKILLS.md (extension points and coding rules) · specs/SPECS.md (contracts and versions) · design/adr/ (major decisions)
-> **Platform version**: strata v1.4.0
+> **Platform version**: strata v1.0.0
 
 ---
 
@@ -97,13 +97,13 @@ class LLMProvider(Protocol):
     def rerank(self, req: RerankRequest) -> RerankResponse: ...
     def stream(self, req: ChatRequest) -> AsyncIterator[StreamChunk]: ...
 
-# VectorStore —— Corresponding platform VectorStore SPI（§10.4），interface_versions: 1.1.0
+# VectorStore —— Corresponding platform VectorStore SPI（§10.4），interface_versions: 1.0.0
 class VectorStore(Protocol):
     def upsert(self, collection: str, docs: list[Doc]) -> None: ...
     def search(self, collection: str, vec: list[float], top_k: int) -> list[Hit]: ...
     def delete(self, collection: str, ids: list[str]) -> None: ...
 
-# AgentRuntime —— Corresponding platform AgentRuntime SPI（§10.6 / §4.3.5），interface_versions: 1.3.0
+# AgentRuntime —— Corresponding platform AgentRuntime SPI（§10.6 / §4.3.5），interface_versions: 1.0.0
 class AgentRuntime(Protocol):
     def load(self, spec: AgentSpec) -> AgentHandle: ...
     def run(self, handle: AgentHandle, input: dict) -> dict: ...
@@ -113,7 +113,7 @@ class Cache(Protocol):
     def get(self, key: str) -> Optional[bytes]: ...
     def set(self, key: str, val: bytes, ttl: float) -> None: ...
 
-# Gateway —— Corresponding platform Gateway SPI（§4.4.1），interface_versions: 1.2.0
+# Gateway —— Corresponding platform Gateway SPI（§4.4.1），interface_versions: 1.0.0
 class Gateway(Protocol):
     def invoke(self, req: GatewayRequest) -> GatewayResponse: ...
 
@@ -196,10 +196,10 @@ client = Client(
 
 | SDK domain port (domain) | Platform SPI port (§10.4 canonical) | interface_versions | SDK role | Default Adapter (bom.yaml) |
 | --- | --- | --- | --- | --- |
-| `Gateway` | **Gateway** | 1.2.0 | Production(invoke) | Higress(core) |
-| `AgentRuntime` | **AgentRuntime** | 1.3.0 | Production (Load/Run) | LangGraph binding execution (core) |
+| `Gateway` | **Gateway** | 1.0.0 | Production(invoke) | Higress(core) |
+| `AgentRuntime` | **AgentRuntime** | 1.0.0 | Production (Load/Run) | LangGraph binding execution (core) |
 | `LLMProvider` | **LLMProvider** | 1.0.0 | Production (chat/embed/rerank/stream) | Qwen-Cloud / OpenAI / Claude (core third party) |
-| `VectorStore` | **VectorStore** | 1.1.0 | Production (upsert/search/delete) | Qdrant (core)/Milvus (optional) |
+| `VectorStore` | **VectorStore** | 1.0.0 | Production (upsert/search/delete) | Qdrant (core)/Milvus (optional) |
 | `Cache` | **Cache** | 1.0.0 | Production (semantic/accurate caching) | Redis (core)/Valkey (optional, OSI) |
 | `Auth` | **Auth** | 1.0.0 | Consumption (tenant Token verification) | Keycloak (core) |
 | `Tracing` | **Tracing** | 1.0.0 | Production (span) | Langfuse (core) / OTel (core baseline) |
