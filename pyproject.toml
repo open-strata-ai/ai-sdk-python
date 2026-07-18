@@ -1,23 +1,25 @@
 [tool.poetry]
-name = "ai-sdk-python"
+name = "openstrata-sdk"
 version = "1.0.0"
-description = "OpenStrata ai-sdk-python"
+description = "OpenStrata Python SDK (import openstrata_sdk)"
 authors = ["OpenStrata <openstrata@outlook.com>"]
-packages = [{{ include = "ai_sdk_python" }}]
+readme = "README.md"
+packages = [{ include = "openstrata_sdk", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.111.0"
-uvicorn = "^0.30.0"
-pydantic = "^2.7.0"
-sqlalchemy = "^2.0.0"
-psycopg2-binary = "^2.9.0"
-redis = "^5.0.0"
+pydantic = "^2.7"
+httpx = "^0.27"
+opentelemetry-api = "^1.20"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.2.0"
-ruff = "^0.5.0"
-mypy = "^1.10.0"
+pytest = "^8.2"
+ruff = "^0.5"
+mypy = "^1.10"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
 
 [build-system]
 requires = ["poetry-core"]
