@@ -16,7 +16,7 @@
 Core Commitments:
 - **Pythonic**: fluent builder, dataclass, async/await, Pydantic v2 type safety
 - **Minimal Invasion**: Only relies on Python 3.11+ + pydantic v2 + httpx + very few necessary dependencies (`opentelemetry-api`), and can be embedded in any Python host
-- **Declarative AgentSpec**: Agent behavior converges to `apiVersion: openstrata.io/v1` AgentSpec, language/runtime independent (§4.3.5)
+- **Declarative AgentSpec**: Agent behavior converges to `apiVersion: openstrata.cc/v1` AgentSpec, language/runtime independent (§4.3.5)
 - **Dependency Inversion**: All platform SPIs are exposed with the `openstrata_sdk.domain` protocol class, and there is no change to the SDK core when the host injects custom adapters
 
 ### 1.2 What problem is solved?
